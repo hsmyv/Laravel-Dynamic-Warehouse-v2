@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class WarehouseController extends Controller
 {
@@ -35,16 +36,19 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        try {
+            $validatedData = $request->validate([
             'name' => 'required',
             'address' => 'required',
             'type'   => 'required'
-        ]);
-
-
-        if ($validator->fails()) {
-            return getError();
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
         }
+
+        // if ($validator->fails()) {
+        //     return getError();
+        // }
 
         $warehouse = [
             'name' => $request->name,
@@ -91,19 +95,36 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        $warehouse = Warehouse::find($id);
-
+   public function update(Request $request, $id)
+{
+        $warehouse = Warehouse::findOrFail($id);
         $warehouse->name = $request->input('name');
         $warehouse->address = $request->input('address');
         $warehouse->type = $request->input('type');
         $warehouse->status = $request->input('status');
-
         $warehouse->save();
 
-        return response()->json(['message' => 'Warehouse updated successfully.'], 200);
+        return redirect()->back()->with('success', 'Warehouse updated successfully!');
     }
+
+        // // Return a success response
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'Warehouse updated successfully',
+        //     'data' => [
+        //             'name' => $warehouse->name,
+        //             'address' => $warehouse->address,
+        //             'type' => $warehouse->type,
+        //             'status' => $warehouse->status,
+        //         ],
+        //     ]);
+        // } else {
+        //     // Return an error response if the warehouse was not found
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Warehouse not found',
+        //     ], 404);
+        // }
 
 
     /**

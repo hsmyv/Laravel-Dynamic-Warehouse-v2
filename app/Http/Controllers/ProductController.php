@@ -13,21 +13,16 @@ class ProductController extends Controller
 {
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name'  => ['required', Rule::unique('products', 'name')->ignore($id)],
-            'price' => 'required',
-            'sell' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'status'    => 'required'
-        ]);
+        $Product = Product::findOrFail($id);
+        $Product->name = $request->input('name');
+        $Product->category_id = $request->input('category_id');
+        $Product->quantity = $request->input('quantity');
+        $Product->price = $request->input('price');
+        $Product->sell = $request->input('sell');
+        $Product->status = $request->input('status');
+        $Product->save();
 
-        if ($validator->fails()) {
-            return getError();
-        }
-
-        $product = Product::findOrFail($id);
-        $product->update($request->all());
-        return back();
+        return redirect()->back()->with('success', 'Product updated successfully!');
     }
 
     public function store(Request $request)

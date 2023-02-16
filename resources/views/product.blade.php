@@ -19,10 +19,10 @@
                             @endif
                         </div>
                         <div class="col-xs-6">
-                            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+                            <a href="#addProductModal" class="btn btn-success" data-toggle="modal"><i
                                     class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
-                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
-                                    class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+                            <a  href="#deleteProductModal" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+
                         </div>
                     </div>
                 </div>
@@ -35,6 +35,7 @@
                                     <input type="checkbox" id="select-all">
                                 </span>
                             </th>
+                            <th>id</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Quantity</th>
@@ -52,15 +53,18 @@
                                         <label for="checkbox5"></label>
                                     </span>
                                 </td>
+                                <td>{{$product->id}}</td>
                                 <td>{{ $product->name }}</td>
-                                <td>{{ $product->category->name }}</td>
+                                <td>{{ $product->category->id }}</td>
                                 <td>{{ $product->quantity }}</td>
                                 <td>{{ $product->price }}</td>
                                 <td>{{ $product->sell }}</td>
                                 <td>{{ $product->status }}</td>
+
                                 <td>
-                                    <a href="#" id="edit" class="edit" data-toggle="modal"><i
-                                            class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                             <a href="#editProductModal" id="edit" data-productid="{{ $product->id }}"
+                                        class="edit" data-toggle="modal"><i class="material-icons"
+                                            data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 
                                 </td>
                             </tr>
@@ -88,13 +92,13 @@
         </div>
     </div>
     <!-- Edit Modal HTML -->
-    <div id="addEmployeeModal" class="modal fade">
+    <div id="addProductModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="POST" action="api/product">
                     @csrf
                     <div class="modal-header">
-                        <h4 class="modal-title">Add Employee</h4>
+                        <h4 class="modal-title">Add Product</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -130,6 +134,7 @@
                             <label>Status</label>
                             <input name="status" value="1" type="text" class="form-control" required>
                         </div>
+
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -140,31 +145,43 @@
         </div>
     </div>
     <!-- Edit Modal HTML -->
-    <div id="editEmployeeModal" class="modal fade">
+    <div id="editProductModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form>
+                <form id="editProductForm">
                     <div class="modal-header">
-                        <h4 class="modal-title">Edit Employee</h4>
+                        <h4 class="modal-title">Edit Product</h4>
                         <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" required>
+                            <input name="name" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" required>
+                            <label>Category</label>
+                            <input name="category_id" type="text" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input name="quantity" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Address</label>
-                            <textarea class="form-control" required></textarea>
+                            <label>Price</label>
+                            <input name="price" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Phone</label>
-                            <input type="text" class="form-control" required>
+                            <label>Sell</label>
+                            <input name="sell" type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <input name="status" type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <input name="id" type="hidden" class="form-control" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -176,12 +193,12 @@
         </div>
     </div>
     <!-- Delete Modal HTML -->
-    <div id="deleteEmployeeModal" class="modal fade">
+    <div id="deleteProductModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form>
                     <div class="modal-header">
-                        <h4 class="modal-title">Delete Employee</h4>
+                        <h4 class="modal-title">Delete Product</h4>
                         <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">&times;</button>
                     </div>
@@ -230,3 +247,75 @@
         $('.product-checkbox').prop('checked', this.checked);
     });
 </script>
+<script>
+    $(document).ready(function() {
+        // When the edit button is clicked
+        $(document).on("click", ".edit", function() {
+            // Get the row data
+            var $row = $(this).closest("tr");
+            var name = $row.find("td:eq(2)").text();
+            var category_id = $row.find("td:eq(3)").text();
+            var quantity = $row.find("td:eq(4)").text();
+            var price = $row.find("td:eq(5)").text();
+            var sell = $row.find("td:eq(6)").text();
+            var status = $row.find("td:eq(7)").text();
+            var id = $row.find("td:eq(1)").text();
+
+            // Fill the form with the selected data
+            $("input[name='name']").val(name);
+            $("input[name='category_id']").val(category_id);
+            $("input[name='quantity']").val(quantity);
+            $("input[name='price']").val(price);
+            $("input[name='sell']").val(sell);
+            $("input[name='status']").val(status);
+            $("input[name='id']").val(id);
+
+            // Set the data-id attribute of the form to the selected Product ID
+            $("#editProductForm").attr("data-id", id);
+
+            // Show the modal
+            $("#editProductModal").modal("show");
+        });
+    });
+</script>
+<script>
+    // When the form is submitted
+    $("#editProductForm").submit(function(e) {
+        e.preventDefault();
+
+        // Get the form data
+        var formData = $(this).serialize();
+        var productid = $(this).data("id");
+
+        // Send the data to the server
+        $.ajax({
+            type: 'POST',
+            url: 'api/products/update/' + productid,
+            data: formData,
+            success: function(data) {
+                // Handle the response from the server
+                if (data.status == 'success') {
+                    // Update the table with the new data
+                    var $row = $("#editProductModal").closest("tr");
+                    $row.find("td:eq(1)").text(data.name);
+                    $row.find("td:eq(2)").text(data.category_id);
+                    $row.find("td:eq(3)").text(data.quantity);
+                    $row.find("td:eq(4)").text(data.price);
+                    $row.find("td:eq(5)").text(data.sell);
+                    $row.find("td:eq(6)").text(data.status);
+
+                    // Hide the modal
+                    $("#editProductModal").modal("hide");
+
+                    // Reload the page to show the updated data
+                    location.reload();
+                } else {
+                    // Show an error message
+                    location.reload();
+
+                }
+            }
+        });
+    });
+</script>
+

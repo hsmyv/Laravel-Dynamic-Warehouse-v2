@@ -22,9 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::delete('warehouse/delete', [WarehouseController::class, 'destroy']);
-Route::post('warehouses/update/{id}', 'WarehouseController@update')->name('warehouse.edit');
+ Route::post('warehouses/update/{id}', [WarehouseController::class, 'update']);
+Route::post('products/update/{id}', [ProductController::class, 'update']);
 
 Route::delete('product/delete', [ProductController::class, 'destroy'])->name('products.destroy');
 
 Route::resource('product',  ProductController::class);
 Route::resource('category', CategoryController::class);
+Route::resource('warehouse', WarehouseController::class);
+

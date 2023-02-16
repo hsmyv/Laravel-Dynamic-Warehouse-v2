@@ -20,7 +20,7 @@
                         </div>
                         <div class="col-xs-6">
                             <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
-                                    class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
+                                    class="material-icons">&#xE147;</i> <span>Add New Warehouse</span></a>
                             <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
                                     class="material-icons">&#xE15C;</i> <span>Delete</span></a>
                         </div>
@@ -52,14 +52,15 @@
                                         <label for="checkbox5"></label>
                                     </span>
                                 </td>
-                                <td>{{$warehouse->id}}</td>
+                                <td>{{ $warehouse->id }}</td>
                                 <td>{{ $warehouse->name }}</td>
                                 <td>{{ $warehouse->address }}</td>
                                 <td>{{ $warehouse->type }}</td>
                                 <td>{{ $warehouse->status }}</td>
                                 <td>
-                                    <a href="#editWarehouseModal" id="edit" data-warehouseid="{{$warehouse->id}}" class="edit" data-toggle="modal"><i
-                                            class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                    <a href="#editWarehouseModal" id="edit" data-warehouseid="{{ $warehouse->id }}"
+                                        class="edit" data-toggle="modal"><i class="material-icons"
+                                            data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 
                                 </td>
                             </tr>
@@ -126,13 +127,12 @@
     <div id="editWarehouseModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="editWarehouseForm" >
+                <form id="editWarehouseForm" data-id="">
                     <div class="modal-header">
                         <h4 class="modal-title">Edit Warehouse</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-
                         <div class="form-group">
                             <label>Name</label>
                             <input name="name" type="text" class="form-control" required>
@@ -150,7 +150,7 @@
                             <input name="status" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="id" class="form-control">
+                            <input type="hidden" name="id" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -161,6 +161,7 @@
             </div>
         </div>
     </div>
+
     <!-- Delete Modal HTML -->
     <div id="deleteEmployeeModal" class="modal fade">
         <div class="modal-dialog">
@@ -217,65 +218,70 @@
     });
 </script>
 
+
+
 <script>
     $(document).ready(function() {
-  // When the edit button is clicked
-  $(document).on("click", ".edit", function() {
-    // Get the row data
-    var $row = $(this).closest("tr");
-    var name = $row.find("td:eq(2)").text();
-    var address = $row.find("td:eq(3)").text();
-    var type = $row.find("td:eq(4)").text();
-    var status = $row.find("td:eq(5)").text();
-    var id = $row.find("td:eq(1)").text();
+        // When the edit button is clicked
+        $(document).on("click", ".edit", function() {
+            // Get the row data
+            var $row = $(this).closest("tr");
+            var name = $row.find("td:eq(2)").text();
+            var address = $row.find("td:eq(3)").text();
+            var type = $row.find("td:eq(4)").text();
+            var status = $row.find("td:eq(5)").text();
+            var id = $row.find("td:eq(1)").text();
 
+            // Fill the form with the selected data
+            $("input[name='name']").val(name);
+            $("input[name='address']").val(address);
+            $("input[name='type']").val(type);
+            $("input[name='status']").val(status);
+            $("input[name='id']").val(id);
 
+            // Set the data-id attribute of the form to the selected warehouse ID
+            $("#editWarehouseForm").attr("data-id", id);
 
-    // Fill the form with the selected data
-    $("input[name='name']").val(name);
-    $("input[name='address']").val(address);
-    $("input[name='type']").val(type);
-    $("input[name='status']").val(status);
-    $("input[name='id']").val(id);
-
-    // Show the modal
-    $("#editWarehouseModal").modal("show");
-  });
-})
+            // Show the modal
+            $("#editWarehouseModal").modal("show");
+        });
+    });
 </script>
-
 <script>
-  $(document).ready(function() {
     // When the form is submitted
     $("#editWarehouseForm").submit(function(e) {
-      e.preventDefault();
-      // Get the form data
-      var formData = $(this).serialize();
-      var warehouseid = $(this).data("warehouseid");
+        e.preventDefault();
 
-      // Send the data to the server
-      $.ajax({
-        type: 'POST',
-        url: 'api/warehouses/update/' + 11,
-        data: formData,
-        success: function(data) {
-          // Handle the response from the server
-          if (data.status == 'success') {
-            // Update the table with the new data
-            var $row = $("#editWarehouseModal").closest("tr");
-            $row.find("td:eq(1)").text(data.name);
-            $row.find("td:eq(2)").text(data.address);
-            $row.find("td:eq(3)").text(data.type);
-            $row.find("td:eq(4)").text(data.status);
+        // Get the form data
+        var formData = $(this).serialize();
+        var warehouseid = $(this).data("id");
 
-            // Hide the modal
-            $("#editWarehouseModal").modal("hide");
-          } else {
-            // Show an error message
-            alert('Error: ' + data.message);
-          }
-        }
-      });
+        // Send the data to the server
+        $.ajax({
+            type: 'POST',
+            url: 'api/warehouses/update/' + warehouseid,
+            data: formData,
+            success: function(data) {
+                // Handle the response from the server
+                if (data.status == 'success') {
+                    // Update the table with the new data
+                    var $row = $("#editWarehouseModal").closest("tr");
+                    $row.find("td:eq(1)").text(data.name);
+                    $row.find("td:eq(2)").text(data.address);
+                    $row.find("td:eq(3)").text(data.type);
+                    $row.find("td:eq(4)").text(data.status);
+
+                    // Hide the modal
+                    $("#editWarehouseModal").modal("hide");
+
+                    // Reload the page to show the updated data
+                    location.reload();
+                } else {
+                    // Show an error message
+                    location.reload();
+
+                }
+            }
+        });
     });
-  });
 </script>
