@@ -6,7 +6,7 @@
                 <div class="table-title">
                     <div class="row">
                         <div class="col-xs-6">
-                            <h2><b>Products</b> - {{$products->count()}}</h2>
+                            <h2>Warehouse - {{$warehouse->name}} - {{$warehouse->products->count()}}</h2>
                             @if (session()->has('success'))
                                 <div class="alert alert-success">
                                     {{ session()->get('success') }}
@@ -19,6 +19,7 @@
                             @endif
                         </div>
                         <div class="col-xs-6">
+                            <a  href="#transaction" class="btn btn-primary" data-toggle="modal"><span>Transaction</span></a>
                             <a href="#addProductModal" class="btn btn-success" data-toggle="modal"><i
                                     class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
                             <a  href="#deleteProductModal" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
@@ -47,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($products as $product)
+                        @foreach ($warehouse->products as $product)
                             <tr>
                                 <td>
                                     <span class="custom-checkbox">
@@ -75,11 +76,11 @@
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    @if ($products->count() > 0)
-                        {{ $products->links() }}
+                    {{-- @if ($warehouse->products->count() > 0)
+                        {{ $warehouse->products->links() }}
                     @else
                         <p>No products found</p>
-                    @endif
+                    @endif --}}
                      {{-- <div class="hint-text">Showing <b>{{ $products->currentPage() }}</b> out of <b></b> entries</div>
                     <ul class="pagination">
                         <li class="page-item"><a href="{{ $products->previousPageUrl() }}">Previous</a></li>
@@ -98,7 +99,7 @@
     <div id="addProductModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="api/product">
+                <form method="POST" action="/api/product">
                     @csrf
                     <div class="modal-header">
                         <h4 class="modal-title">Add Product</h4>
@@ -121,12 +122,10 @@
                                 @endforeach
                             </select>
                         </div>
-                          <div class="form-group">
+                        <div class="form-group">
                             <label>Warehouse</label>
                             <select name="warehouse_id">
-                                @foreach ($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="form-group">
@@ -174,11 +173,10 @@
                             <label>Category</label>
                             <input name="category_id" type="text" class="form-control" required>
                         </div>
-                          <div class="form-group">
+                         <div class="form-group">
                             <label>Warehouse</label>
                             <input name="warehouse_id" type="text" class="form-control" required>
                         </div>
-
                         <div class="form-group">
                             <label>Quantity</label>
                             <input name="quantity" class="form-control" required>
@@ -229,6 +227,46 @@
             </div>
         </div>
     </div>
+
+        <!-- Transaction Modal HTML -->
+    <div id="transaction" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form  data-id=""> ///burda qaldin
+                    <div class="modal-header">
+                        <h4 class="modal-title">Transaction Products</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Product name</label>
+                            <select name="product_name">
+                                @foreach ($warehouse->products as $product)
+                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                         <div class="form-group">
+                            <label>Receiver Warehouse</label>
+                            <select name="warehouse_id">
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input name="quantity" type="text" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn btn-info" value="Save">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-layout>
 
 <script>
@@ -242,7 +280,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: 'DELETE',
-            url: 'api/product/delete',
+            url: '/api/product/delete',
             data: {
                 productIds: productIds
             },
@@ -307,7 +345,7 @@
         // Send the data to the server
         $.ajax({
             type: 'POST',
-            url: 'api/products/update/' + productid,
+            url: '/api/products/update/' + productid,
             data: formData,
             success: function(data) {
                 // Handle the response from the server

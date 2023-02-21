@@ -16,6 +16,7 @@ class ProductController extends Controller
         $Product = Product::findOrFail($id);
         $Product->name = $request->input('name');
         $Product->category_id = $request->input('category_id');
+        $Product->warehouse_id = $request->input('warehouse_id');
         $Product->quantity = $request->input('quantity');
         $Product->price = $request->input('price');
         $Product->sell = $request->input('sell');
@@ -34,16 +35,17 @@ class ProductController extends Controller
                 'price' => 'required',
                 'sell'  => 'required',
                 'category_id' => 'required|exists:categories,id',
+                'warehouse_id'=> 'required'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         }
+
         // if($validator->fails()){
         //     return getError();
         // }
 
         $product = Product::create($validatedData);
-
         if ($product) {
             return redirect()->back()->with('success', 'Product was stored successful!');
         } else {

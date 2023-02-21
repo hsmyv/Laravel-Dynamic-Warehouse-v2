@@ -6,7 +6,7 @@
                 <div class="table-title">
                     <div class="row">
                         <div class="col-xs-6">
-                            <h2>Manage <b>Warehouses</b> - Warehouse - {{ $warehouses->count() }}</h2>
+                            <h2><b>Warehouses</b> - {{ $warehouses->count() }}</h2>
                             @if (session()->has('success'))
                                 <div class="alert alert-success">
                                     {{ session()->get('success') }}
@@ -23,6 +23,8 @@
                                     class="material-icons">&#xE147;</i> <span>Add New Warehouse</span></a>
                             <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
                                     class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+                            <a  href="/products" class="btn btn-success" data-toggle="modal"><span>Product</span></a>
+
                         </div>
                     </div>
                 </div>
@@ -53,7 +55,7 @@
                                     </span>
                                 </td>
                                 <td>{{ $warehouse->id }}</td>
-                                <td>{{ $warehouse->name }}</td>
+                                <td><a href="{{route('warehouse.show', $warehouse)}}">{{ $warehouse->name }}</a></td>
                                 <td>{{ $warehouse->address }}</td>
                                 <td>{{ $warehouse->type }}</td>
                                 <td>{{ $warehouse->status }}</td>
@@ -161,6 +163,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Delete Modal HTML -->
     <div id="deleteEmployeeModal" class="modal fade">

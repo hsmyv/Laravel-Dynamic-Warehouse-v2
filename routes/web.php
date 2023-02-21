@@ -15,15 +15,15 @@ use App\Models\Warehouse;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::redirect('/', '/products');
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/product', function () {
+
+Route::get('/products', function () {
     return view('product', [
         'products' => Product::latest()->simplePaginate(10),
-        'categories' => Category::All()
+        'categories' => Category::All(),
+        'warehouses' => Warehouse::all()
     ]);
 });
 Route::get('/category', function () {
@@ -31,18 +31,6 @@ Route::get('/category', function () {
         'categories' => Category::All()
     ]);
 });
-Route::get('/category/{category:id}/edit', function (Category $category) {
-    return view('category-edit', [
-        'category' => $category
-    ]);
-});
-Route::get('/warehouse/{warehouse:id}/edit', function (Warehouse $warehouse) {
-    return view('warehouse-edit', [
-        'warehouse' => $warehouse
-    ]);
-});
-
-
 Route::get('/warehouses', function(){
     return view('warehouse', [ 'warehouses' => Warehouse::all()]);
 });

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -72,9 +74,11 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Warehouse $warehouse)
     {
-        //
+        $warehouses = Warehouse::all();
+        $categories = Category::all();
+        return view('warehouse.show', ['warehouse' => $warehouse, 'categories' => $categories, 'warehouses' => $warehouses]);
     }
 
     /**
@@ -141,5 +145,15 @@ class WarehouseController extends Controller
             $warehouse->delete();
         }
         return back();
+    }
+
+
+    public function send(Request $request)
+    {
+       $warehouse = Warehouse::where('id', $request->warehouse_id)->findOrFail();
+       $product = $warehouse->where('product_name', $request->product_name)->findOrFail();
+       $total = $product->quantity + $request->quantity;
+       dd($total);
+       return back();
     }
 }
