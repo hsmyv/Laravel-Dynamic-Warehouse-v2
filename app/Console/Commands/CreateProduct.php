@@ -47,6 +47,7 @@ class CreateProduct extends Command
             $price = random_int(0,999);
             $sell  = random_int(0,999);
             $cat_id = random_int(2,3);
+            $ware_id= 2;
             $status = random_int(0,1);
             $quantity = random_int(0,999);
 
@@ -55,6 +56,7 @@ class CreateProduct extends Command
                 'price' => $price,
                 'sell' => $sell,
                 'category_id' => $cat_id,
+                'warehouse_id'=> $ware_id,
                 'status'    => $status,
                 'quantity'  => $quantity
             ]);

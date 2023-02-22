@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
@@ -59,7 +60,22 @@ class ProductController extends Controller
     }
     public function index()
     {
-        return Product::All();
+        if(Cache::has('products'))
+        {
+            return Cache::get('products');
+        }
+        $product = Product::all();
+        Cache::put('products', $product, now()->addMinutes(10));
+        return $product;
+
+        //  return Cache::remember('products' , '120', function (){
+        //      return Product::all();
+        //  });
+
+        // return Cache::get('products' , function (){
+        //     return Product::all();
+        // });
+        //return Product::All();
     }
 
     public function destroy(Request $request)
