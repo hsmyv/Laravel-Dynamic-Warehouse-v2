@@ -47,10 +47,9 @@ class ProductController extends Controller
 
         $product = Product::create($validatedData);
         if ($product) {
-            return redirect()->back()->with('success', 'Product was stored successful!');
+            return back()->with('success', 'Product was stored successful!');
         } else {
-            session()->flash('error', 'An error occured while processing store your product!');
-            // return redirect()->back()->with('error', 'An error occured while processing store your product!');
+             return redirect()->back()->with('error', 'An error occured while processing store your product!');
         }
     }
 

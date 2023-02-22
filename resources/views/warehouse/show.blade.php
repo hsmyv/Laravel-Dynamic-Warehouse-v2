@@ -232,17 +232,18 @@
     <div id="transaction" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form  data-id=""> ///burda qaldin
+                <form  method="POST" action="{{route('product.send')}}">
                     <div class="modal-header">
                         <h4 class="modal-title">Transaction Products</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
+                        <input type="hidden" name="sender_warehouse_id" value="{{$warehouse->id}}">
                         <div class="form-group">
                             <label>Product name</label>
                             <select name="product_name">
                                 @foreach ($warehouse->products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    <option value="{{ $product->name }}">{{ $product->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -261,7 +262,7 @@
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                        <input type="submit" class="btn btn-info" value="Save">
+                        <input type="submit" class="btn btn-info" value="Send">
                     </div>
                 </form>
             </div>

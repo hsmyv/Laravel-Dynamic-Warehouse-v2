@@ -18,7 +18,7 @@ class WarehouseController extends Controller
      */
     public function index()
     {
-        return Warehouse::All();
+        return view('warehouse', ['warehouses' => Warehouse::all()]);
     }
 
     /**
@@ -40,9 +40,9 @@ class WarehouseController extends Controller
     {
         try {
             $validatedData = $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-            'type'   => 'required'
+                'name' => 'required',
+                'address' => 'required',
+                'type'   => 'required'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -99,8 +99,8 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-   public function update(Request $request, $id)
-{
+    public function update(Request $request, $id)
+    {
         $warehouse = Warehouse::findOrFail($id);
         $warehouse->name = $request->input('name');
         $warehouse->address = $request->input('address');
@@ -111,24 +111,24 @@ class WarehouseController extends Controller
         return redirect()->back()->with('success', 'Warehouse updated successfully!');
     }
 
-        // // Return a success response
-        // return response()->json([
-        //     'status' => 'success',
-        //     'message' => 'Warehouse updated successfully',
-        //     'data' => [
-        //             'name' => $warehouse->name,
-        //             'address' => $warehouse->address,
-        //             'type' => $warehouse->type,
-        //             'status' => $warehouse->status,
-        //         ],
-        //     ]);
-        // } else {
-        //     // Return an error response if the warehouse was not found
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'Warehouse not found',
-        //     ], 404);
-        // }
+    // // Return a success response
+    // return response()->json([
+    //     'status' => 'success',
+    //     'message' => 'Warehouse updated successfully',
+    //     'data' => [
+    //             'name' => $warehouse->name,
+    //             'address' => $warehouse->address,
+    //             'type' => $warehouse->type,
+    //             'status' => $warehouse->status,
+    //         ],
+    //     ]);
+    // } else {
+    //     // Return an error response if the warehouse was not found
+    //     return response()->json([
+    //         'status' => 'error',
+    //         'message' => 'Warehouse not found',
+    //     ], 404);
+    // }
 
 
     /**
@@ -150,10 +150,30 @@ class WarehouseController extends Controller
 
     public function send(Request $request)
     {
-       $warehouse = Warehouse::where('id', $request->warehouse_id)->findOrFail();
-       $product = $warehouse->where('product_name', $request->product_name)->findOrFail();
-       $total = $product->quantity + $request->quantity;
-       dd($total);
-       return back();
+        $product = Product::where('status', '1')
+            ->where('name', $request->product_name)
+            ->where('warehouse_id', $request->sender_warehouse_id)->first();
+
+        if ($product->quantity >= $request->quantity) {
+            $total = $product->quantity - $request->quantity;
+            $product->quantity = $total;
+            $product->save();
+
+            $product = Product::where('status', '1')
+                ->where('name', $request->product_name)
+                ->where('warehouse_id', $request->warehouse_id)->first();
+
+            if ($product) {
+                $total = $product->quantity + $request->quantity;
+                $product->quantity = $total;
+                $product->save();
+            } else {
+                return back()->with('error', 'Failed to find product');
+            }
+            return redirect()->back()->with(['success' => 'Product transferred successfully.']);
+        } else {
+            return back()->with('error', 'Failed to transfer product. Quantity is less than you requested.');
+        }
+        return back();
     }
 }

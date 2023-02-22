@@ -7,16 +7,6 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <h2><b>Products</b> - {{$products->count()}}</h2>
-                            @if (session()->has('success'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('success') }}
-                                </div>
-                            @endif
-                            @if (session()->has('error'))
-                                <div class="alert alert-danger">
-                                    {{ session()->get('error') }}
-                                </div>
-                            @endif
                         </div>
                         <div class="col-xs-6">
                             <a href="#addProductModal" class="btn btn-success" data-toggle="modal"><i
