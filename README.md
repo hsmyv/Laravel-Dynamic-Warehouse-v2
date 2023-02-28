@@ -9,7 +9,7 @@ You can see the products and create,edit products.
 
 
 
-You can see the warehouses and create,edit products.
+You can see the warehouses and create,edit warehouses.
 
 ![warehouses](https://user-images.githubusercontent.com/111653544/221832152-ed99154d-963b-4175-b73e-18389ef8a0e6.PNG)
 ![add warehouse](https://user-images.githubusercontent.com/111653544/221832365-a0dcf085-5687-4536-bce5-fca94337340c.PNG)
