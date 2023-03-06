@@ -63,8 +63,8 @@ class WarehouseController extends Controller
         if ($warehouse) {
             return redirect()->back()->with('success', 'Product was stored successful!');
         } else {
-            session()->flash('error', 'An error occured while processing store your product!');
-            // return redirect()->back()->with('error', 'An error occured while processing store your product!');
+            //session()->flash('error', 'An error occured while processing store your product!');
+            return redirect()->back()->with('error', 'An error occured while processing store your product!');
         }
     }
 
@@ -76,9 +76,15 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse)
     {
+        $warehouseProducts = $warehouse->products()->latest()->get();
         $warehouses = Warehouse::all();
         $categories = Category::all();
-        return view('warehouse.show', ['warehouse' => $warehouse, 'categories' => $categories, 'warehouses' => $warehouses]);
+        return view('warehouse.show', [
+            'warehouseProducts' => $warehouseProducts,
+            'warehouse' => $warehouse,
+            'categories' => $categories,
+            'warehouses' => $warehouses
+        ]);
     }
 
     /**
@@ -150,30 +156,36 @@ class WarehouseController extends Controller
 
     public function send(Request $request)
     {
+        $sended_product = Product::where('status', '1')
+            ->where('name', $request->product_name)
+            ->where('warehouse_id', $request->receiver_warehouse_id)
+            ->first();
+
+        if (!$sended_product) {
+            return back()->with('error', "Failed to find product in the other warehouse");
+        }
+
         $product = Product::where('status', '1')
             ->where('name', $request->product_name)
-            ->where('warehouse_id', $request->sender_warehouse_id)->first();
+            ->where('warehouse_id', $request->sender_warehouse_id)
+            ->first();
 
-        if ($product->quantity >= $request->quantity) {
-            $total = $product->quantity - $request->quantity;
-            $product->quantity = $total;
-            $product->save();
+        if (!$product) {
+            return back()->with('error', "Failed to find product in this warehouse");
+        }
 
-            $product = Product::where('status', '1')
-                ->where('name', $request->product_name)
-                ->where('warehouse_id', $request->warehouse_id)->first();
-
-            if ($product) {
-                $total = $product->quantity + $request->quantity;
-                $product->quantity = $total;
-                $product->save();
-            } else {
-                return back()->with('error', 'Failed to find product');
-            }
-            return redirect()->back()->with(['success' => 'Product transferred successfully.']);
-        } else {
+        if ($product->quantity < $request->quantity) {
             return back()->with('error', 'Failed to transfer product. Quantity is less than you requested.');
         }
-        return back();
+
+        $total = $product->quantity - $request->quantity;
+        $product->quantity = $total;
+        $product->save();
+
+        $total = $sended_product->quantity + $request->quantity;
+        $sended_product->quantity = $total;
+        $sended_product->save();
+
+        return redirect()->back()->with(['success' => 'Product transferred successfully.']);
     }
 }

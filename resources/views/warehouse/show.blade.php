@@ -6,24 +6,15 @@
                 <div class="table-title">
                     <div class="row">
                         <div class="col-xs-6">
-                            <h2>Warehouse - {{$warehouse->name}} - {{$warehouse->products->count()}}</h2>
-                            @if (session()->has('success'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('success') }}
-                                </div>
-                            @endif
-                            @if (session()->has('error'))
-                                <div class="alert alert-danger">
-                                    {{ session()->get('error') }}
-                                </div>
-                            @endif
+                            <h2>Warehouse - {{ $warehouse->name }} - {{ $warehouse->products->count() }}</h2>
                         </div>
                         <div class="col-xs-6">
-                            <a  href="#transaction" class="btn btn-primary" data-toggle="modal"><span>Transaction</span></a>
+                            <a href="#transaction" class="btn btn-primary" data-toggle="modal"><span>Transaction</span></a>
                             <a href="#addProductModal" class="btn btn-success" data-toggle="modal"><i
                                     class="material-icons">&#xE147;</i> <span>Add New Product</span></a>
-                            <a  href="#deleteProductModal" class="btn btn-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Delete</span></a>
-                            <a  href="/warehouses" class="btn btn-success" data-toggle="modal"><span>Warehouse</span></a>
+                            <a href="#deleteProductModal" class="btn btn-danger" data-toggle="modal"><i
+                                    class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+                            <a href="/warehouses" class="btn btn-success" data-toggle="modal"><span>Warehouse</span></a>
 
                         </div>
                     </div>
@@ -48,7 +39,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($warehouse->products as $product)
+                        @foreach ($warehouseProducts as $product)
                             <tr>
                                 <td>
                                     <span class="custom-checkbox">
@@ -56,7 +47,7 @@
                                         <label for="checkbox5"></label>
                                     </span>
                                 </td>
-                                <td>{{$product->id}}</td>
+                                <td>{{ $product->id }}</td>
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category->id }}</td>
                                 <td>{{ $product->warehouse->id }}</td>
@@ -66,7 +57,7 @@
                                 <td>{{ $product->status }}</td>
 
                                 <td>
-                                             <a href="#editProductModal" id="edit" data-productid="{{ $product->id }}"
+                                    <a href="#editProductModal" id="edit" data-productid="{{ $product->id }}"
                                         class="edit" data-toggle="modal"><i class="material-icons"
                                             data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 
@@ -81,7 +72,7 @@
                     @else
                         <p>No products found</p>
                     @endif --}}
-                     {{-- <div class="hint-text">Showing <b>{{ $products->currentPage() }}</b> out of <b></b> entries</div>
+                    {{-- <div class="hint-text">Showing <b>{{ $products->currentPage() }}</b> out of <b></b> entries</div>
                     <ul class="pagination">
                         <li class="page-item"><a href="{{ $products->previousPageUrl() }}">Previous</a></li>
                         <li class="page-item"><a href="#" class="page-link">1</a></li>
@@ -125,12 +116,12 @@
                         <div class="form-group">
                             <label>Warehouse</label>
                             <select name="warehouse_id">
-                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Quantity</label>
-                            <input name="quantity" value="10" type="text" class="form-control" required>
+                            <input name="quantity" value="10" type="number" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Price</label>
@@ -173,13 +164,13 @@
                             <label>Category</label>
                             <input name="category_id" type="text" class="form-control" required>
                         </div>
-                         <div class="form-group">
+                        <div class="form-group">
                             <label>Warehouse</label>
                             <input name="warehouse_id" type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Quantity</label>
-                            <input name="quantity" class="form-control" required>
+                            <input type="number" name="quantity" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label>Price</label>
@@ -228,28 +219,29 @@
         </div>
     </div>
 
-        <!-- Transaction Modal HTML -->
+    <!-- Transaction Modal HTML -->
     <div id="transaction" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form  method="POST" action="{{route('product.send')}}">
+                <form method="POST" action="{{ route('product.send') }}">
                     <div class="modal-header">
                         <h4 class="modal-title">Transaction Products</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="sender_warehouse_id" value="{{$warehouse->id}}">
+                        <input type="hidden" name="sender_warehouse_id" value="{{ $warehouse->id }}">
                         <div class="form-group">
                             <label>Product name</label>
                             <select name="product_name">
-                                @foreach ($warehouse->products as $product)
+                                @foreach ($warehouseProducts as $product)
                                     <option value="{{ $product->name }}">{{ $product->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                         <div class="form-group">
+                        <div class="form-group">
                             <label>Receiver Warehouse</label>
-                            <select name="warehouse_id">
+                            <select name="receiver_warehouse_id">
                                 @foreach ($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach
@@ -257,7 +249,7 @@
                         </div>
                         <div class="form-group">
                             <label>Quantity</label>
-                            <input name="quantity" type="text" class="form-control" required>
+                            <input type="number" name="quantity" type="text" class="form-control" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -375,6 +367,3 @@
         });
     });
 </script>
-
-
-

@@ -31,12 +31,12 @@ class ProductController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name'  => 'required|string|unique:products',
+                'name'  => 'required|string',
                 'quantity' => 'required',
                 'price' => 'required',
                 'sell'  => 'required',
                 'category_id' => 'required|exists:categories,id',
-                'warehouse_id'=> 'required'
+                'warehouse_id' => 'required'
             ]);
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -50,7 +50,7 @@ class ProductController extends Controller
         if ($product) {
             return back()->with('success', 'Product was stored successful!');
         } else {
-             return redirect()->back()->with('error', 'An error occured while processing store your product!');
+            return redirect()->back()->with('error', 'An error occured while processing store your product!');
         }
     }
 
@@ -60,8 +60,7 @@ class ProductController extends Controller
     }
     public function index()
     {
-        if(Cache::has('products'))
-        {
+        if (Cache::has('products')) {
             return Cache::get('products');
         }
         $product = Product::all();
